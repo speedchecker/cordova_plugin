@@ -12,7 +12,7 @@
     "cordova-android",
     "cordova-ios"
   ],
-  "author": "meduxspeedchecker",
+  "author": "speedchecker",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
