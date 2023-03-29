@@ -1,0 +1,18 @@
+
+repositories {
+    google()
+    mavenCentral()
+    jcenter()
+    maven {
+        url 'https://maven.speedcheckerapi.com/artifactory/libs-release'
+        credentials {
+            username = ""
+            password = ""
+        }
+    }
+}
+
+dependencies {
+    implementation("com.speedchecker:android-sdk:4.2.194-medux-test")
+    implementation("com.android.volley:volley:1.2.0")
+}
