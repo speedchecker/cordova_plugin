@@ -19,9 +19,6 @@ module.exports = function (context) {
         }
     }
 
-    var username = getPreferenceConfig('speedcheckerapi_username') || '';
-    var password = getPreferenceConfig('speedcheckerapi_password') || '';
-
     // Defining new content that we want to add
     var UpdateContent = `
 repositories {
@@ -31,8 +28,8 @@ repositories {
     maven {
         url 'https://maven.speedcheckerapi.com/artifactory/libs-release'
         credentials {
-            username = "${username}"
-            password = "${password}"
+            username = "demo"
+            password = "AP85qiz6wYEsCttWU2ZckEWSwJKuA6mSYcizEY"
         }
     }
 }

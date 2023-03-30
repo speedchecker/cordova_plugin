@@ -1,6 +1,6 @@
 {
   "name": "@speedchecker/cordova-plugin",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Integrated solution with Speedchecker SDK for Cordova",
   "main": "index.js",
   "scripts": {

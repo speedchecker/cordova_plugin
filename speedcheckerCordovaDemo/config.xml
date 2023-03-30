@@ -10,10 +10,6 @@
     <allow-intent href="https://*/*" />
 	<platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
-            <preference name="speedcheckerapi_username" value="medux" />
-            <preference name="speedcheckerapi_password" value="APG28xgbjG4Kk4eZZoAE9TyquQSU3uMff2xuW" />
-        </config-file>
-        <config-file target="res/xml/config.xml" parent="/*">
             <feature name="SpeedCheckerPlugin" >
                 <param name="android-package" value="org.apache.cordova.speedchecker.SpeedCheckerPlugin"/>
             </feature>

@@ -29,7 +29,7 @@ Integrated solution with Speedchecker SDK for Cordova (Apache Cordova) and Ionic
 
 ### 1. Create a Cordova project
 ```
-cordova create [project folder] app.medux.demo [name]
+cordova create [project folder] [your app package name] [name]
 ```
 
 ### 2. Go to project directory
@@ -49,10 +49,6 @@ cordova platform add ios
 * Android:
 ```
 	<platform name="android">
-        <config-file target="res/xml/config.xml" parent="/*">
-            <preference name="speedcheckerapi_username" value="your_user" />
-            <preference name="speedcheckerapi_password" value="Your_Password" />
-        </config-file>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="SpeedCheckerPlugin" >
                 <param name="android-package" value="org.apache.cordova.speedchecker.SpeedCheckerPlugin"/>
