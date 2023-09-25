@@ -14,7 +14,7 @@ Integrated solution with Speedchecker SDK for Cordova (Apache Cordova) and Ionic
 
 * Platform-specific requirements:
     * Android:
-        *  minSDK version: 21 or higher
+        *  minSDK version: 22 or higher
         *  Cordova Android version: android 11.x of higher
     * iOS:
         * Xcode 13.3.1 or later

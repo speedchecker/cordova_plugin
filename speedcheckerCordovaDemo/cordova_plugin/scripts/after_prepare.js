@@ -35,8 +35,9 @@ repositories {
 }
 
 dependencies {
-    implementation("com.speedchecker:android-sdk:4.2.194-medux")
-    implementation("com.android.volley:volley:1.2.0")
+    mplementation("com.speedchecker:android-sdk:4.2.212-sh")
+        implementation 'org.webrtc:google-webrtc:1.0.32006'
+        implementation("com.android.volley:volley:1.2.0")
 }
 `;
 

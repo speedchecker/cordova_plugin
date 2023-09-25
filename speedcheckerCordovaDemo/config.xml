@@ -16,7 +16,7 @@
         </config-file>
         <source-file src="platforms/android/app/src/main/java/org/apache/cordova/speedchecker/SpeedCheckerPlugin.java" target-dir="src/org/apache/cordova/speedchecker" />
     </platform>
-    <preference name="android-minSdkVersion" value="21" />
+    <preference name="android-minSdkVersion" value="22" />
     <preference name="android-targetSdkVersion" value="31" />
     <preference name="android-compileSdkVersion" value="31" />
 </widget>

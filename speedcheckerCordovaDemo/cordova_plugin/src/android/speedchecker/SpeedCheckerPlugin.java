@@ -76,7 +76,7 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
                 JSONObject result = new JSONObject();
                 try {
                     result.put(PARAMETER_EVENT, "finished");
-                    result.put(PARAMETER_PACKETLOSS, speedTestResult.getPacketLoss());
+                    result.put(PARAMETER_PACKETLOSS, WebRtcCloudFlarePacketLossTest.getPacketLoss());
                     result.put(PARAMETER_PING, speedTestResult.getPing());
                     result.put(PARAMETER_DOWNLOAD_SPEED, speedTestResult.getDownloadSpeed());
                     result.put(PARAMETER_UPLOAD_SPEED, speedTestResult.getUploadSpeed());
@@ -182,6 +182,7 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
             EDebug.l("Start SpeedTest");
             this.callbackContext = callbackContext;
             SpeedcheckerSDK.SpeedTest.startTest(cordova.getContext());
+            WebRtcCloudFlarePacketLossTest.start(cordova.getContext());
             return true;
         } else if ("shareBackgroundTestLogs".equals(action)) {
             EDebug.sendLogFiles(cordova.getActivity());
