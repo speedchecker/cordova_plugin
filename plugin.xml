@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin 
+    xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    id="cordova-plugin"
+    version="1.0.3">
+
+    <name>Speedchecker Cordova Plugin</name>
+    <description>Integrated solution with Speedchecker SDK for Cordova</description>
+    <license>Apache 2.0</license>
+    <repo>https://github.com/speedchecker/cordova_plugin</repo>
+    <issue>https://github.com/speedchecker/cordova_plugin/issues</issue>
+
+    <engines>
+        <engine name="cordova" version=">=11.0.0"/>
+        <engine name="cordova-android" version=">=11.0.0" />
+        <engine name="cordova-ios" version=">=6.2.0" />
+    </engines>
+    
+    <js-module name="SpeedCheckerPlugin" src="www/SpeedCheckerPlugin.js">
+        <clobbers target="SpeedCheckerPlugin" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="SpeedCheckerPlugin">
+                <param name="android-package" value="org.apache.cordova.speedchecker.SpeedCheckerPlugin" />
+                <param name="onload" value="true" />
+            </feature>
+            <preference name="speedcheckerapi_username" />
+            <preference name="speedcheckerapi_password" />
+            <preference name="android-minSdkVersion" value="19" />
+        </config-file>
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="SpeedCheckerPlugin">
+                <param name="android-package" value="org.apache.cordova.speedchecker.SpeedCheckerPlugin" />
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/speedchecker/SpeedCheckerPlugin.java" target-dir="src/org/apache/cordova/speedchecker" />
+        <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+
+        <hook type="before_plugin_install" src="scripts/after_prepare.js" />
+        <hook type="after_plugin_install" src="scripts/after_prepare.js" />
+    </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file parent="/*" target="config.xml">
+			<feature name="SpeedCheckerPlugin">
+				<param name="ios-package" value="SpeedCheckerPlugin" />
+			</feature>
+		</config-file>
+
+		<header-file src="src/ios/SpeedCheckerPlugin.h" />
+		<source-file src="src/ios/SpeedCheckerPlugin.m" />
+		<header-file src="src/ios/AppDelegate+SpeedCheckerPlugin.h" />
+		<source-file src="src/ios/AppDelegate+SpeedCheckerPlugin.m" />
+
+		<framework src="src/ios/DataCompression.xcframework"   embed="true" custom="true" /> 
+		<framework src="src/ios/Socket.xcframework"   embed="true" custom="true" /> 
+		<framework src="src/ios/XMLParsing.xcframework"   embed="true" custom="true" /> 
+		<framework src="src/ios/SpeedcheckerSDK.xcframework"   embed="true" custom="true" /> 
+
+		<edit-config target="BGTaskSchedulerPermittedIdentifiers" file="*-Info.plist" mode="merge">
+            <array>
+				<string>com.speedchecker.bgtests</string>
+			</array>
+		</edit-config>
+	</platform>
+</plugin>
