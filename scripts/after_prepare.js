@@ -25,8 +25,9 @@ repositories {
     google()
     mavenCentral()
     jcenter()
+    maven { url "https://jitpack.io" }
     maven {
-        url 'https://maven.speedcheckerapi.com/artifactory/libs-release'
+        url 'https://maven.speedcheckerapi.com/artifactory/libs-demo'
         credentials {
             username = "demo"
             password = "AP85qiz6wYEsCttWU2ZckEWSwJKuA6mSYcizEY"
@@ -35,9 +36,8 @@ repositories {
 }
 
 dependencies {
-    mplementation("com.speedchecker:android-sdk:4.2.212-sh")
-        implementation 'org.webrtc:google-webrtc:1.0.32006'
-        implementation("com.android.volley:volley:1.2.0")
+    implementation 'com.speedchecker:android-sdk:4.2.220-demo'
+    implementation("com.android.volley:volley:1.2.0")
 }
 `;
 

@@ -10,6 +10,7 @@ import com.speedchecker.android.sdk.Public.EDebug;
 import com.speedchecker.android.sdk.Public.SpeedTestListener;
 import com.speedchecker.android.sdk.Public.SpeedTestResult;
 import com.speedchecker.android.sdk.SpeedcheckerSDK;
+import com.speedchecker.android.sdk.Public.SpeedTestOptions;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -25,21 +26,23 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
     private static final int PERMISSION_LOCATION = 0;
     private static final int PERMISSION_BACKGROUND_LOCATION = 1;
     private static final String PARAMETER_EVENT = "event";
-    private static final String PARAMETER_PACKETLOSS = "packetLoss";
+    private static final String PARAMETER_ERROR = "error";
     private static final String PARAMETER_PING = "ping";
     private static final String PARAMETER_JITTER = "jitter";
     private static final String PARAMETER_DOWNLOAD_SPEED = "downloadSpeed";
     private static final String PARAMETER_UPLOAD_SPEED = "uploadSpeed";
     private static final String PARAMETER_PROGRESS = "progress";
-    private static final String PARAMETER_CITY = "city";
+    private static final String PARAMETER_IP = "ipAddress";
+    private static final String PARAMETER_ISP = "ispName";
+    private static final String PARAMETER_TIMESTAMP = "timestamp";
     private static final String PARAMETER_SERVER = "server";
     private static final String PARAMETER_CONNECTION_TYPE = "connectionType";
 
     private static final String[] locationPermissions = new String[]
-    {
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    };
+            {
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            };
 
     private CallbackContext callbackContext;
 
@@ -50,40 +53,44 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
         EDebug.l("Initialize plugin");
         SpeedcheckerSDK.init(cordova.getContext());
         SpeedcheckerSDK.SpeedTest.setOnSpeedTestListener(new SpeedTestListener() {
+
             @Override
             public void onTestStarted() {
-                JSONObject json = new JSONObject();
+            }
+
+            @Override
+            public void onFetchServerFailed(Integer errorCode) {
+                callbackContext.error(errorCode);
+            }
+
+            @Override
+            public void onFindingBestServerStarted() {
+                JSONObject result = new JSONObject();
                 try {
-                    json.put(PARAMETER_EVENT, "test_started");
-                    logResult(json);
+                    result.put(PARAMETER_EVENT, "received_servers");
+                    logResult(result);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
 
             @Override
-            public void onFetchServerFailed() {
-                callbackContext.error("Test Server Fetch Failed");
-            }
-
-            @Override
-            public void onFindingBestServerStarted() {
-
-            }
-
-            @Override
             public void onTestFinished(SpeedTestResult speedTestResult) {
-                JSONObject result = new JSONObject();
                 try {
+                    JSONObject data = new JSONObject();
+                    data.put(PARAMETER_PING, speedTestResult.getPing());
+                    data.put(PARAMETER_DOWNLOAD_SPEED, speedTestResult.getDownloadSpeed());
+                    data.put(PARAMETER_UPLOAD_SPEED, speedTestResult.getUploadSpeed());
+                    data.put(PARAMETER_JITTER, speedTestResult.getJitter());
+                    data.put(PARAMETER_CONNECTION_TYPE, speedTestResult.getConnectionTypeHuman());
+                    data.put(PARAMETER_SERVER, speedTestResult.getServerInfo());
+                    data.put(PARAMETER_IP, speedTestResult.UserIP);
+                    data.put(PARAMETER_ISP, speedTestResult.UserISP);
+                    data.put(PARAMETER_TIMESTAMP, speedTestResult.getDate());
+
+                    JSONObject result = new JSONObject();
                     result.put(PARAMETER_EVENT, "finished");
-                    result.put(PARAMETER_PACKETLOSS, WebRtcCloudFlarePacketLossTest.getPacketLoss());
-                    result.put(PARAMETER_PING, speedTestResult.getPing());
-                    result.put(PARAMETER_DOWNLOAD_SPEED, speedTestResult.getDownloadSpeed());
-                    result.put(PARAMETER_UPLOAD_SPEED, speedTestResult.getUploadSpeed());
-                    result.put(PARAMETER_JITTER, speedTestResult.getJitter());
-                    result.put(PARAMETER_CONNECTION_TYPE, speedTestResult.getConnectionTypeHuman());
-                    result.put(PARAMETER_SERVER, speedTestResult.getServerInfo());
-                    result.put(PARAMETER_CITY, speedTestResult.getCityName());
+                    result.put("data", data);
                     logResult(result);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -92,15 +99,24 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
 
             @Override
             public void onPingStarted() {
-
+                JSONObject result = new JSONObject();
+                try {
+                    result.put(PARAMETER_EVENT, "ping_started");
+                    logResult(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onPingFinished(int ping, int i1) {
-                JSONObject result = new JSONObject();
                 try {
+                    JSONObject data = new JSONObject();
+                    data.put(PARAMETER_PING, ping);
+
+                    JSONObject result = new JSONObject();
                     result.put(PARAMETER_EVENT, "ping_finished");
-                    result.put(PARAMETER_PING, ping);
+                    result.put("data", data);
                     logResult(result);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -109,16 +125,9 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
 
             @Override
             public void onDownloadTestStarted() {
-
-            }
-
-            @Override
-            public void onDownloadTestProgress(int progress, double downloadSpeed, double v1) {
                 JSONObject result = new JSONObject();
                 try {
-                    result.put(PARAMETER_EVENT, "download_progress");
-                    result.put(PARAMETER_DOWNLOAD_SPEED, downloadSpeed);
-                    result.put(PARAMETER_PROGRESS, progress);
+                    result.put(PARAMETER_EVENT, "download_started");
                     logResult(result);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -126,22 +135,42 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
             }
 
             @Override
-            public void onDownloadTestFinished(double v) {
+            public void onDownloadTestProgress(int progress, double downloadSpeed, double v1) {
+                try {
+                    JSONObject data = new JSONObject();
+                    data.put(PARAMETER_DOWNLOAD_SPEED, downloadSpeed);
+                    data.put(PARAMETER_PROGRESS, progress);
+
+                    JSONObject result = new JSONObject();
+                    result.put(PARAMETER_EVENT, "download_progress");
+                    result.put("data", data);
+                    logResult(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onDownloadTestFinished(double downloadSpeed) {
+                try {
+                    JSONObject data = new JSONObject();
+                    data.put(PARAMETER_DOWNLOAD_SPEED, downloadSpeed);
+
+                    JSONObject result = new JSONObject();
+                    result.put(PARAMETER_EVENT, "download_finished");
+                    result.put("data", data);
+                    logResult(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             }
 
             @Override
             public void onUploadTestStarted() {
-
-            }
-
-            @Override
-            public void onUploadTestProgress(int progress, double uploadSpeed, double v1) {
                 JSONObject result = new JSONObject();
                 try {
-                    result.put(PARAMETER_EVENT, "upload_progress");
-                    result.put(PARAMETER_UPLOAD_SPEED, uploadSpeed);
-                    result.put(PARAMETER_PROGRESS, progress);
+                    result.put(PARAMETER_EVENT, "upload_started");
                     logResult(result);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -149,8 +178,35 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
             }
 
             @Override
-            public void onUploadTestFinished(double v) {
+            public void onUploadTestProgress(int progress, double uploadSpeed, double v1) {
+                try {
+                    JSONObject data = new JSONObject();
+                    data.put(PARAMETER_UPLOAD_SPEED, uploadSpeed);
+                    data.put(PARAMETER_PROGRESS, progress);
 
+                    JSONObject result = new JSONObject();
+                    result.put(PARAMETER_EVENT, "upload_progress");
+                    result.put("data", data);
+                    logResult(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onUploadTestFinished(double uploadSpeed) {
+
+                try {
+                    JSONObject data = new JSONObject();
+                    data.put(PARAMETER_UPLOAD_SPEED, uploadSpeed);
+
+                    JSONObject result = new JSONObject();
+                    result.put(PARAMETER_EVENT, "upload_finished");
+                    result.put("data", data);
+                    logResult(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -182,7 +238,6 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
             EDebug.l("Start SpeedTest");
             this.callbackContext = callbackContext;
             SpeedcheckerSDK.SpeedTest.startTest(cordova.getContext());
-            WebRtcCloudFlarePacketLossTest.start(cordova.getContext());
             return true;
         } else if ("shareBackgroundTestLogs".equals(action)) {
             EDebug.sendLogFiles(cordova.getActivity());
@@ -219,6 +274,9 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
         } else if ("requestBackgroundLocationPermission".equals(action)) {
             this.callbackContext = callbackContext;
             cordova.requestPermission(this, PERMISSION_BACKGROUND_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+            return true;
+        } else if ("getUniqueID".equals(action)) {
+            callbackContext.success(SpeedcheckerSDK.getUniqueId(cordova.getActivity()));
             return true;
         } else {
             return false;
