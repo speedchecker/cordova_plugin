@@ -37,6 +37,7 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
     private static final String PARAMETER_TIMESTAMP = "timestamp";
     private static final String PARAMETER_SERVER = "server";
     private static final String PARAMETER_CONNECTION_TYPE = "connectionType";
+    private static String LICENSE_KEY = "";
 
     private static final String[] locationPermissions = new String[]
             {
@@ -51,179 +52,6 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
         super.initialize(cordova, webView);
         EDebug.initWritableLogs(cordova.getContext());
         EDebug.l("Initialize plugin");
-        SpeedcheckerSDK.init(cordova.getContext());
-        SpeedcheckerSDK.SpeedTest.setOnSpeedTestListener(new SpeedTestListener() {
-
-            @Override
-            public void onTestStarted() {
-            }
-
-            @Override
-            public void onFetchServerFailed(Integer errorCode) {
-                callbackContext.error(errorCode);
-            }
-
-            @Override
-            public void onFindingBestServerStarted() {
-                JSONObject result = new JSONObject();
-                try {
-                    result.put(PARAMETER_EVENT, "received_servers");
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onTestFinished(SpeedTestResult speedTestResult) {
-                try {
-                    JSONObject data = new JSONObject();
-                    data.put(PARAMETER_PING, speedTestResult.getPing());
-                    data.put(PARAMETER_DOWNLOAD_SPEED, speedTestResult.getDownloadSpeed());
-                    data.put(PARAMETER_UPLOAD_SPEED, speedTestResult.getUploadSpeed());
-                    data.put(PARAMETER_JITTER, speedTestResult.getJitter());
-                    data.put(PARAMETER_CONNECTION_TYPE, speedTestResult.getConnectionTypeHuman());
-                    data.put(PARAMETER_SERVER, speedTestResult.getServerInfo());
-                    data.put(PARAMETER_IP, speedTestResult.UserIP);
-                    data.put(PARAMETER_ISP, speedTestResult.UserISP);
-                    data.put(PARAMETER_TIMESTAMP, speedTestResult.getDate());
-
-                    JSONObject result = new JSONObject();
-                    result.put(PARAMETER_EVENT, "finished");
-                    result.put("data", data);
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onPingStarted() {
-                JSONObject result = new JSONObject();
-                try {
-                    result.put(PARAMETER_EVENT, "ping_started");
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onPingFinished(int ping, int i1) {
-                try {
-                    JSONObject data = new JSONObject();
-                    data.put(PARAMETER_PING, ping);
-
-                    JSONObject result = new JSONObject();
-                    result.put(PARAMETER_EVENT, "ping_finished");
-                    result.put("data", data);
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onDownloadTestStarted() {
-                JSONObject result = new JSONObject();
-                try {
-                    result.put(PARAMETER_EVENT, "download_started");
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onDownloadTestProgress(int progress, double downloadSpeed, double v1) {
-                try {
-                    JSONObject data = new JSONObject();
-                    data.put(PARAMETER_DOWNLOAD_SPEED, downloadSpeed);
-                    data.put(PARAMETER_PROGRESS, progress);
-
-                    JSONObject result = new JSONObject();
-                    result.put(PARAMETER_EVENT, "download_progress");
-                    result.put("data", data);
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onDownloadTestFinished(double downloadSpeed) {
-                try {
-                    JSONObject data = new JSONObject();
-                    data.put(PARAMETER_DOWNLOAD_SPEED, downloadSpeed);
-
-                    JSONObject result = new JSONObject();
-                    result.put(PARAMETER_EVENT, "download_finished");
-                    result.put("data", data);
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onUploadTestStarted() {
-                JSONObject result = new JSONObject();
-                try {
-                    result.put(PARAMETER_EVENT, "upload_started");
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onUploadTestProgress(int progress, double uploadSpeed, double v1) {
-                try {
-                    JSONObject data = new JSONObject();
-                    data.put(PARAMETER_UPLOAD_SPEED, uploadSpeed);
-                    data.put(PARAMETER_PROGRESS, progress);
-
-                    JSONObject result = new JSONObject();
-                    result.put(PARAMETER_EVENT, "upload_progress");
-                    result.put("data", data);
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onUploadTestFinished(double uploadSpeed) {
-
-                try {
-                    JSONObject data = new JSONObject();
-                    data.put(PARAMETER_UPLOAD_SPEED, uploadSpeed);
-
-                    JSONObject result = new JSONObject();
-                    result.put(PARAMETER_EVENT, "upload_finished");
-                    result.put("data", data);
-                    logResult(result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onTestWarning(String s) {
-
-            }
-
-            @Override
-            public void onTestFatalError(String s) {
-                callbackContext.error(s);
-            }
-
-            @Override
-            public void onTestInterrupted(String s) {
-                callbackContext.error(s);
-            }
-        });
     }
 
     @Override
@@ -237,7 +65,182 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
         } else if ("startTest".equals(action)) {
             EDebug.l("Start SpeedTest");
             this.callbackContext = callbackContext;
-            SpeedcheckerSDK.SpeedTest.startTest(cordova.getContext());
+            if (!LICENSE_KEY.isEmpty()) {
+                SpeedcheckerSDK.init(cordova.getContext(), LICENSE_KEY);
+                SpeedcheckerSDK.SpeedTest.setOnSpeedTestListener(new SpeedTestListener() {
+
+                    @Override
+                    public void onTestStarted() {
+                    }
+
+                    @Override
+                    public void onFetchServerFailed(Integer errorCode) {
+                        callbackContext.error(errorCode);
+                    }
+
+                    @Override
+                    public void onFindingBestServerStarted() {
+                        JSONObject result = new JSONObject();
+                        try {
+                            result.put(PARAMETER_EVENT, "received_servers");
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onTestFinished(SpeedTestResult speedTestResult) {
+                        try {
+                            JSONObject data = new JSONObject();
+                            data.put(PARAMETER_PING, speedTestResult.getPing());
+                            data.put(PARAMETER_DOWNLOAD_SPEED, speedTestResult.getDownloadSpeed());
+                            data.put(PARAMETER_UPLOAD_SPEED, speedTestResult.getUploadSpeed());
+                            data.put(PARAMETER_JITTER, speedTestResult.getJitter());
+                            data.put(PARAMETER_CONNECTION_TYPE, speedTestResult.getConnectionTypeHuman());
+                            data.put(PARAMETER_SERVER, speedTestResult.getServerInfo());
+                            data.put(PARAMETER_IP, speedTestResult.UserIP);
+                            data.put(PARAMETER_ISP, speedTestResult.UserISP);
+                            data.put(PARAMETER_TIMESTAMP, speedTestResult.getDate());
+
+                            JSONObject result = new JSONObject();
+                            result.put(PARAMETER_EVENT, "finished");
+                            result.put("data", data);
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onPingStarted() {
+                        JSONObject result = new JSONObject();
+                        try {
+                            result.put(PARAMETER_EVENT, "ping_started");
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onPingFinished(int ping, int i1) {
+                        try {
+                            JSONObject data = new JSONObject();
+                            data.put(PARAMETER_PING, ping);
+
+                            JSONObject result = new JSONObject();
+                            result.put(PARAMETER_EVENT, "ping_finished");
+                            result.put("data", data);
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onDownloadTestStarted() {
+                        JSONObject result = new JSONObject();
+                        try {
+                            result.put(PARAMETER_EVENT, "download_started");
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onDownloadTestProgress(int progress, double downloadSpeed, double v1) {
+                        try {
+                            JSONObject data = new JSONObject();
+                            data.put(PARAMETER_DOWNLOAD_SPEED, downloadSpeed);
+                            data.put(PARAMETER_PROGRESS, progress);
+
+                            JSONObject result = new JSONObject();
+                            result.put(PARAMETER_EVENT, "download_progress");
+                            result.put("data", data);
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onDownloadTestFinished(double downloadSpeed) {
+                        try {
+                            JSONObject data = new JSONObject();
+                            data.put(PARAMETER_DOWNLOAD_SPEED, downloadSpeed);
+
+                            JSONObject result = new JSONObject();
+                            result.put(PARAMETER_EVENT, "download_finished");
+                            result.put("data", data);
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                    @Override
+                    public void onUploadTestStarted() {
+                        JSONObject result = new JSONObject();
+                        try {
+                            result.put(PARAMETER_EVENT, "upload_started");
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onUploadTestProgress(int progress, double uploadSpeed, double v1) {
+                        try {
+                            JSONObject data = new JSONObject();
+                            data.put(PARAMETER_UPLOAD_SPEED, uploadSpeed);
+                            data.put(PARAMETER_PROGRESS, progress);
+
+                            JSONObject result = new JSONObject();
+                            result.put(PARAMETER_EVENT, "upload_progress");
+                            result.put("data", data);
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onUploadTestFinished(double uploadSpeed) {
+
+                        try {
+                            JSONObject data = new JSONObject();
+                            data.put(PARAMETER_UPLOAD_SPEED, uploadSpeed);
+
+                            JSONObject result = new JSONObject();
+                            result.put(PARAMETER_EVENT, "upload_finished");
+                            result.put("data", data);
+                            logResult(result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onTestWarning(String s) {
+
+                    }
+
+                    @Override
+                    public void onTestFatalError(String s) {
+                        callbackContext.error(s);
+                    }
+
+                    @Override
+                    public void onTestInterrupted(String s) {
+                        callbackContext.error(s);
+                    }
+                });
+                SpeedcheckerSDK.SpeedTest.startTest(cordova.getContext());
+            }
             return true;
         } else if ("shareBackgroundTestLogs".equals(action)) {
             EDebug.sendLogFiles(cordova.getActivity());
@@ -251,6 +254,9 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
             return true;
         } else if ("getBackgroundNetworkTestingEnabled".equals(action)) {
             callbackContext.success(String.valueOf(SpeedcheckerSDK.isBackgroundNetworkTesting(cordova.getActivity())));
+            return true;
+        } else if ("setLicenseKey".equals(action)) {
+            LICENSE_KEY = args.getString(0);
             return true;
         } else if ("setMSISDN".equals(action)) {
             SpeedcheckerSDK.setMSISDN(cordova.getActivity(), args.getString(0));
