@@ -2,7 +2,7 @@
 <plugin 
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     id="cordova-plugin"
-    version="1.0.3">
+    version="1.0.4">
 
     <name>Speedchecker Cordova Plugin</name>
     <description>Integrated solution with Speedchecker SDK for Cordova</description>
