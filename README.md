@@ -173,14 +173,15 @@ Plugin includes "startTest" function, which has following signature:
 startTest = function (
     onFinished,
     onError,
-    onReceivedServers = function (obj) { },
-    onSelectedServer = function (obj) { },
-    onDownloadStarted = function () { },
-    onDownloadProgress = function (obj) { },
-    onDownloadFinished = function () { },
-    onUploadStarted = function () { },
-    onUploadProgress = function (obj) { },
-    onUploadFinished = function () { },
+    onReceivedServers = function () {},
+    onPingStarted = function () {},
+    onPingFinished = function (obj) {},
+    onDownloadStarted = function () {},
+    onDownloadProgress = function (obj) {},
+    onDownloadFinished = function (obj) {},
+    onUploadStarted = function () {},
+    onUploadProgress = function (obj) {},
+    onUploadFinished = function (obj) {}
 ) {...}
 ````
 You need to implement these functions in index.js, similar to this sample function:
