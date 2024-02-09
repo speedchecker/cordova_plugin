@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.speedchecker.demo" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <feature name="SpeedCheckerPlugin">
+        <param name="android-package" value="org.apache.cordova.speedchecker.SpeedCheckerPlugin" />
+    </feature>
+    <feature name="SpeedCheckerPlugin">
+        <param name="android-package" value="org.apache.cordova.speedchecker.SpeedCheckerPlugin" />
+        <param name="onload" value="true" />
+    </feature>
+    <preference name="speedcheckerapi_username" />
+    <preference name="speedcheckerapi_password" />
+    <name>test</name>
+    <description>Sample Apache Cordova App</description>
+    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
+        Apache Cordova Team
+    </author>
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <config-file parent="/*" target="res/xml/config.xml">
+    </config-file>
+    <source-file src="platforms/android/app/src/main/java/org/apache/cordova/speedchecker/SpeedCheckerPlugin.java" target-dir="src/org/apache/cordova/speedchecker" />
+    <preference name="loglevel" value="DEBUG" />
+    <preference name="android-minSdkVersion" value="21" />
+    <preference name="android-targetSdkVersion" value="33" />
+    <preference name="android-compileSdkVersion" value="33" />
+</widget>

@@ -1,0 +1,10 @@
+{
+  "cordova-plugin": {
+    "source": {
+      "type": "local",
+      "path": "/Users/murod/AndroidStudioProjects/speedchecker/Cordova projects/test/node_modules/@speedchecker/cordova-plugin"
+    },
+    "is_top_level": true,
+    "variables": {}
+  }
+}

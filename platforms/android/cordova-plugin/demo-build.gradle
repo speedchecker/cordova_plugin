@@ -1,0 +1,19 @@
+
+repositories {
+    google()
+    mavenCentral()
+    jcenter()
+    maven { url "https://jitpack.io" }
+    maven {
+        url 'https://maven.speedcheckerapi.com/artifactory/libs-release'
+        credentials {
+            username = "speedchecker"
+            password = "AP3Zg8iFoiatscExgkeMHP3ur9EcsNkbxC8e6gXr8QV9PeWtiAVM3pETm8pF"
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.speedchecker:android-sdk:4.2.221'
+    implementation("com.android.volley:volley:1.2.0")
+}

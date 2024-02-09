@@ -1,0 +1,55 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {
+      "res/xml/config.xml": {
+        "parents": {
+          "/*": [
+            {
+              "xml": "<feature name=\"SpeedCheckerPlugin\"><param name=\"android-package\" value=\"org.apache.cordova.speedchecker.SpeedCheckerPlugin\" /></feature>",
+              "count": 11
+            },
+            {
+              "xml": "<feature name=\"SpeedCheckerPlugin\"><param name=\"android-package\" value=\"org.apache.cordova.speedchecker.SpeedCheckerPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
+              "count": 1
+            },
+            {
+              "xml": "<preference name=\"speedcheckerapi_username\" />",
+              "count": 1
+            },
+            {
+              "xml": "<preference name=\"speedcheckerapi_password\" />",
+              "count": 1
+            },
+            {
+              "xml": "<preference name=\"android-minSdkVersion\" value=\"19\" />",
+              "count": 1
+            }
+          ]
+        }
+      }
+    }
+  },
+  "installed_plugins": {
+    "cordova-plugin": {
+      "PACKAGE_NAME": "com.speedchecker.demo"
+    }
+  },
+  "dependent_plugins": {},
+  "modules": [
+    {
+      "id": "cordova-plugin.SpeedCheckerPlugin",
+      "file": "plugins/cordova-plugin/www/SpeedCheckerPlugin.js",
+      "pluginId": "cordova-plugin",
+      "clobbers": [
+        "SpeedCheckerPlugin"
+      ]
+    }
+  ],
+  "plugin_metadata": {
+    "cordova-plugin": "1.0.3"
+  }
+}
