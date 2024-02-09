@@ -144,6 +144,22 @@ exports.setMSISDN = function (value, error) {
     exec(function (obj) { }, error, 'SpeedCheckerPlugin', 'setMSISDN', [value]);
 }
 
+exports.setAndroidLicenseKey = function (value, success, error) {
+    if (cordova.platformId === 'android') {
+        exec(success, error, 'SpeedCheckerPlugin', 'setLicenseKey', [value]);
+    } else {
+        error('Platform is not Android');
+    }
+};
+
+exports.setIosLicenseKey = function (value, success, error) {
+    if (cordova.platformId === 'ios') {
+        exec(success, error, 'SpeedCheckerPlugin', 'setLicenseKey', [value]);
+    } else {
+        error('Platform is not iOS');
+    }
+};
+
 exports.getUserID = function (success, error) {
     exec(success, error, 'SpeedCheckerPlugin', 'getUserID', []);
 }

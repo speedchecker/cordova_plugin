@@ -5,15 +5,15 @@ repositories {
     jcenter()
     maven { url "https://jitpack.io" }
     maven {
-        url 'https://maven.speedcheckerapi.com/artifactory/libs-demo'
+        url 'https://maven.speedcheckerapi.com/artifactory/libs-release'
         credentials {
-            username = "demo"
-            password = "AP85qiz6wYEsCttWU2ZckEWSwJKuA6mSYcizEY"
+            username = "speedchecker"
+            password = "AP3Zg8iFoiatscExgkeMHP3ur9EcsNkbxC8e6gXr8QV9PeWtiAVM3pETm8pF"
         }
     }
 }
 
 dependencies {
-    implementation 'com.speedchecker:android-sdk:4.2.220-demo'
+    implementation 'com.speedchecker:android-sdk:4.2.221'
     implementation("com.android.volley:volley:1.2.0")
 }

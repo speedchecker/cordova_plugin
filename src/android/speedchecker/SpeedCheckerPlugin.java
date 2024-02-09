@@ -37,6 +37,7 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
     private static final String PARAMETER_TIMESTAMP = "timestamp";
     private static final String PARAMETER_SERVER = "server";
     private static final String PARAMETER_CONNECTION_TYPE = "connectionType";
+    private static String LICENSE_KEY = "";
 
     private static final String[] locationPermissions = new String[]
             {
@@ -51,7 +52,7 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
         super.initialize(cordova, webView);
         EDebug.initWritableLogs(cordova.getContext());
         EDebug.l("Initialize plugin");
-        SpeedcheckerSDK.init(cordova.getContext());
+        SpeedcheckerSDK.init(cordova.getContext(), LICENSE_KEY);
         SpeedcheckerSDK.SpeedTest.setOnSpeedTestListener(new SpeedTestListener() {
 
             @Override
@@ -251,6 +252,9 @@ public class SpeedCheckerPlugin extends CordovaPlugin {
             return true;
         } else if ("getBackgroundNetworkTestingEnabled".equals(action)) {
             callbackContext.success(String.valueOf(SpeedcheckerSDK.isBackgroundNetworkTesting(cordova.getActivity())));
+            return true;
+        } else if ("setLicenseKey".equals(action)) {
+            LICENSE_KEY = args.getString(0);
             return true;
         } else if ("setMSISDN".equals(action)) {
             SpeedcheckerSDK.setMSISDN(cordova.getActivity(), args.getString(0));
