@@ -1,22 +1,27 @@
 {
-  "name": "@speedchecker/cordova-plugin",
-  "version": "1.0.3",
-  "description": "Integrated solution with Speedchecker SDK for Cordova",
+  "name": "app.test.com",
+  "displayName": "test",
+  "version": "1.0.0",
+  "description": "A sample Apache Cordova application that responds to the deviceready event.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "speedchecker",
-    "cordova",
-    "cordova-android",
-    "cordova-ios"
+    "ecosystem:cordova"
   ],
-  "author": "speedchecker",
+  "author": "Apache Cordova Team",
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/speedchecker/cordova_plugin.git"
+  "devDependencies": {
+    "@speedchecker/cordova-plugin": "file:cordova_plugin",
+    "cordova-android": "^11.0.0"
   },
-  "homepage": "https://github.com/speedchecker/cordova_plugin#readme"
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {
+      "cordova-plugin": {}
+    }
+  }
 }
