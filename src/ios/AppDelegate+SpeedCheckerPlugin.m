@@ -12,6 +12,8 @@
 
 static NSString *const kBackgroundTestEnabledOnInit = @"SpeedCheckerBackgroundTestEnabledOnInit";
 static NSString *const kBackgroundTestNotUsed = @"SpeedCheckerBackgroundTestNotUsed";
+static NSString *const kBackgroundConfigURL = @"SpeedCheckerBackgroundConfigURL";
+static NSString *const kSpeedCheckerLicenseKey = @"SpeedCheckerLicenseKey";
 
 #define kBackgroundTest @"kBackgroundTest"
 #define kLocationManager @"kLocationManager"
@@ -42,7 +44,7 @@ static AppDelegate* instance;
     
     // Init BackgroundTest
     if (self.backgroundTest == nil) {
-        self.backgroundTest = [[BackgroundTest alloc] initWithTestsEnabled:self.testStartOnInit];
+        self.backgroundTest = [[BackgroundTest alloc] initWithLicenseKey:self.licenseKey url:self.backgroundConfigURL testsEnabled:self.testStartOnInit];
     }
     
     // Load your configuration
@@ -119,6 +121,22 @@ static AppDelegate* instance;
         return [testNotUsed boolValue];
     }
     return NO;
+}
+
+- (NSString*)licenseKey {
+    id key = [[NSBundle mainBundle] objectForInfoDictionaryKey:kSpeedCheckerLicenseKey];
+    if ([key isKindOfClass:[NSString class]]) {
+        return key;
+    }
+    return nil;
+}
+
+- (NSString*)backgroundConfigURL {
+    id configURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:kBackgroundConfigURL];
+    if ([configURL isKindOfClass:[NSString class]]) {
+        return configURL;
+    }
+    return nil;
 }
 
 @end

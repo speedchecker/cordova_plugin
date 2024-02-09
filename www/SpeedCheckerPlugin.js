@@ -97,6 +97,9 @@ exports.startTest = function (
                 case 8:
                   errorMessage = "app ISP mismatch";
                   break;
+                case 9:
+                  errorMessage = "invalid license key";
+                  break;
                 default:
                   errorMessage = "error code: " + error;
                   break;
@@ -152,14 +155,6 @@ exports.setAndroidLicenseKey = function (value, success, error) {
     }
 };
 
-exports.setIosLicenseKey = function (value, success, error) {
-    if (cordova.platformId === 'ios') {
-        exec(success, error, 'SpeedCheckerPlugin', 'setLicenseKey', [value]);
-    } else {
-        error('Platform is not iOS');
-    }
-};
-
 exports.getUserID = function (success, error) {
     exec(success, error, 'SpeedCheckerPlugin', 'getUserID', []);
 }
@@ -170,38 +165,4 @@ exports.setUserID = function (value, error) {
 
 exports.getUniqueID = function (success, error) {
     exec(success, error, 'SpeedCheckerPlugin', 'getUniqueID', []);
-}
-
-exports.requestLocationPermissions = function () {
-    cordova.plugins.diagnostic.getLocationAuthorizationStatus(function (status) {
-        console.log("Current location permission status");
-        switch (status) {
-            case cordova.plugins.diagnostic.permissionStatus.NOT_REQUESTED:
-                console.log("Permission not requested");
-                requestLocationPermission(cordova.plugins.diagnostic.locationAuthorizationMode.WHEN_IN_USE, function (status) { requestLocationPermission(cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS); });
-                break;
-            case cordova.plugins.diagnostic.permissionStatus.DENIED_ALWAYS:
-                console.log("Permission denied");
-                break;
-            case cordova.plugins.diagnostic.permissionStatus.GRANTED:
-                console.log("Permission granted always");
-                break;
-            case cordova.plugins.diagnostic.permissionStatus.GRANTED_WHEN_IN_USE:
-                console.log("Permission granted only when in use");
-                requestLocationPermission(cordova.plugins.diagnostic.locationAuthorizationMode.ALWAYS);
-                break;
-        }
-    }, function (error) {
-        console.error("The following error occurred: " + error);
-    });
-}
-
-function requestLocationPermission(authorizationMode, onSuccess = function(status){}) {
-    cordova.plugins.diagnostic.requestLocationAuthorization(
-        onSuccess,
-        function(error) {
-            console.error(error);
-        },
-        authorizationMode
-    );
 }

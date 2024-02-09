@@ -88,19 +88,34 @@ cordova platform add ios
     <preference name="android-compileSdkVersion" value="33" />
 
 ```
-* iOS
+* iOS:
+
+Location permission keys:
 ```
-<!--Location permission keys-->
+<!--WhenInUse location permission key is required if you are free SDK user.-->
+<config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
+    <string>your custom text here</string>
+</config-file>
+
+<!--Always location permission keys are required if you are using background tests.-->
 <config-file target="*-Info.plist" parent="NSLocationAlwaysAndWhenInUseUsageDescription">
     <string>your custom text here</string>
 </config-file>
 <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
     <string>your custom text here</string>
 </config-file>
-<config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
-    <string>your custom text here</string>
-</config-file>
+```
 
+If you don't want to use background tests add this to your config.xml file:
+```
+<!--Disable background tests-->
+<config-file target="*-Info.plist" parent="SpeedCheckerBackgroundTestNotUsed">
+    <true/>
+</config-file>
+```
+
+If you want to use background tests add this to your config.xml file:
+```
 <!--Background modes key-->
 <config-file target="*-Info.plist" parent="UIBackgroundModes">
     <array>
@@ -109,9 +124,19 @@ cordova platform add ios
     </array>
 </config-file>
 
+<!--BGTaskSchedulerPermittedIdentifiers key-->
+<config-file target="*-Info.plist" parent="BGTaskSchedulerPermittedIdentifiers">
+    <array>
+        <string>com.speedchecker.bgtests</string>
+    </array>
+</config-file>
+
 <!--Background test setup keys-->
 <config-file target="*-Info.plist" parent="SpeedCheckerBackgroundTestEnabledOnInit">
     <true/>
+</config-file>
+<config-file target="*-Info.plist" parent="SpeedCheckerBackgroundConfigURL">
+    <string>your background config URL</string>
 </config-file>
 ```
 
@@ -145,8 +170,9 @@ cordova emulate ios
 Use the following (sample) functions in index.js:
 
 #### To set a license key (for paid clients).
-if you have a license key, you can add your key as a String value in the app:
+* Android:
 
+if you have a license key, you can add your key as a String value in the app:
 ```
 SpeedCheckerPlugin.setAndroidLicenseKey(
             "your_Androidlicense_key",
@@ -155,17 +181,17 @@ SpeedCheckerPlugin.setAndroidLicenseKey(
             }
     )
 ```
-```
-SpeedCheckerPlugin.setIosLicenseKey(
-            "your_Ioslicense_key",
-            function(err) {
-                console.log(err);
-            }
-    )
-```
-Licenses should be set _before_ starting the test. Make sure your package name (for Android) or bundle id (for iOS) is the same as
-defined in your license agreement. You can use both methods simultaneously if you have licenses for both platforms
+License should be set _before_ starting the test. 
+* iOS:
 
+if you have a license key, you can add your key to config.xml:
+```
+<config-file target="*-Info.plist" parent="SpeedCheckerLicenseKey">
+    <string>your_iOSLicense_key</string>
+</config-file>
+```
+
+Make sure your package name (for Android) or bundle id (for iOS) is the same as defined in your license agreement.
 
 ### To start speed test by event (e.g. button click):
 Plugin includes "startTest" function, which has following signature:

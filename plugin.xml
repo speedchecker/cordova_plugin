@@ -58,15 +58,10 @@
 		<header-file src="src/ios/AppDelegate+SpeedCheckerPlugin.h" />
 		<source-file src="src/ios/AppDelegate+SpeedCheckerPlugin.m" />
 
-		<framework src="src/ios/DataCompression.xcframework"   embed="true" custom="true" /> 
-		<framework src="src/ios/Socket.xcframework"   embed="true" custom="true" /> 
-		<framework src="src/ios/XMLParsing.xcframework"   embed="true" custom="true" /> 
-		<framework src="src/ios/SpeedcheckerSDK.xcframework"   embed="true" custom="true" /> 
-
-		<edit-config target="BGTaskSchedulerPermittedIdentifiers" file="*-Info.plist" mode="merge">
-            <array>
-				<string>com.speedchecker.bgtests</string>
-			</array>
-		</edit-config>
+        <podspec>
+            <pods>
+                <pod name="SpeedcheckerSDK" spec="2.0.2" />
+            </pods>
+        </podspec>
 	</platform>
 </plugin>

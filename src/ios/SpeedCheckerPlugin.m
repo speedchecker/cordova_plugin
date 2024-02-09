@@ -4,12 +4,12 @@
 #import <Cordova/CDV.h>
 #import "AppDelegate+SpeedCheckerPlugin.h"
 @import SpeedcheckerSDK;
-@import CoreLocation;
 
 
 typedef enum {
     InternetSpeedTestEventReceivedServers,
-    InternetSpeedTestEventSelectedServer,
+    InternetSpeedTestEventPingStarted,
+    InternetSpeedTestEventPingFinished,
     InternetSpeedTestEventDownloadStarted,
     InternetSpeedTestEventDownloadProgress,
     InternetSpeedTestEventDownloadFinished,
@@ -21,8 +21,6 @@ typedef enum {
 
 
 @interface SpeedCheckerPlugin () <InternetSpeedTestDelegate>
-
-@property (nonatomic, strong) CLLocationManager *locationManager;
 
 @property (nonatomic, strong) InternetSpeedTest *internetTest;
 
@@ -41,21 +39,15 @@ typedef enum {
 #pragma mark - Commands
 
 - (void)startTest:(CDVInvokedUrlCommand*)command {
-    if (command.arguments.count == 0) {
-        self.command = command;
-        [self checkPermissionsAndStartTest];
-    } else {
-        self.command = nil;
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"invalid arguments"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }
+    self.command = command;
+    [self startSpeedTest];
 }
 
 - (void)stopTest:(CDVInvokedUrlCommand*)command {
     if (self.internetTest) {
         [self.internetTest forceFinish:^(enum SpeedTestError error) {
             if (error != SpeedTestErrorOk) {
-                CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageToErrorObject:(int)error];
+                CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt:(int)error];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             } else {
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
@@ -84,74 +76,46 @@ typedef enum {
     }
 }
 
-- (void)getMSISDN:(CDVInvokedUrlCommand*)command {
-    NSString *msisdn = [InternetSpeedTest msisdn];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:msisdn];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
-- (void)setMSISDN:(CDVInvokedUrlCommand*)command {
-    if (command.arguments.count == 1 && ([command.arguments[0] isKindOfClass:[NSString class]] || [command.arguments[0] isEqual:[NSNull null]])) {
-        NSString *msisdn = [self objectOrNil:command.arguments[0]];
-        [InternetSpeedTest setMsisdn:msisdn];
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"invalid arguments"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }
-}
-
-- (void)getUserID:(CDVInvokedUrlCommand*)command {
-    NSString *userID = [InternetSpeedTest userID];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:userID];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
-- (void)setUserID:(CDVInvokedUrlCommand*)command {
-    if (command.arguments.count == 1 && ([command.arguments[0] isKindOfClass:[NSString class]] || [command.arguments[0] isEqual:[NSNull null]])) {
-        NSString *userID = [self objectOrNil:command.arguments[0]];
-        [InternetSpeedTest setUserID:userID];
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"invalid arguments"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }
-}
-
 - (void)shareBackgroundTestLogs:(CDVInvokedUrlCommand*)command {
     UIViewController *viewController = [AppDelegate instance].viewController;
     [BackgroundTest shareLogsFromViewController:viewController presentationSourceView:viewController.view];
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
 }
 
-#pragma mark - Helpers
-
-- (void)checkPermissionsAndStartTest {
-    SCLocationHelper *locationHelper = [[SCLocationHelper alloc] init];
-    [locationHelper locationServicesEnabled:^(BOOL locationEnabled) {
-        if (!locationEnabled) {
-            [self sendErrorResult:SpeedTestErrorLocationUndefined];
-            return;
-        }
-
-        [self startSpeedTest];
-    }];
+- (void)setSpeedTestDebugLogsEnabled:(CDVInvokedUrlCommand*)command {
+    if (command.arguments.count == 1 && [command.arguments[0] isKindOfClass:[NSNumber class]]) {
+        BOOL logsEnabled = [command.arguments[0] boolValue];
+        InternetSpeedTest.debugLogsEnabled = logsEnabled;
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"invalid arguments"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
 }
 
+#pragma mark - Helpers
+
 - (void)startSpeedTest {
-    self.internetTest = [[InternetSpeedTest alloc] initWithIsBackground:NO delegate:self];
-    [self.internetTest start:^(enum SpeedTestError error) {
+    NSString *licenseKey = [AppDelegate instance].licenseKey;
+    self.internetTest = [[InternetSpeedTest alloc] initWithLicenseKey:licenseKey delegate:self];
+    
+    typedef void (^SpeedTestCompletionHandler)(enum SpeedTestError error);
+    SpeedTestCompletionHandler completionHandler = ^(enum SpeedTestError error) {
         if (error != SpeedTestErrorOk) {
-            NSLog(@"Error %ld", (long)error);
             [self sendErrorResult:error];
         }
-    }];
+    };
+    
+    if ([self isStringNilOrEmpty:licenseKey]) {
+        [self.internetTest startFreeTest:completionHandler];
+    } else {
+        [self.internetTest start:completionHandler];
+    }
 }
 
 - (void)sendErrorResult:(SpeedTestError)error {
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageToErrorObject:(int)error];
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt:(int)error];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:self.command.callbackId];
 }
 
@@ -169,8 +133,10 @@ typedef enum {
     switch (event) {
          case InternetSpeedTestEventReceivedServers:
             return @"received_servers";
-        case InternetSpeedTestEventSelectedServer:
-            return @"selected_server";
+        case InternetSpeedTestEventPingStarted:
+            return @"ping_started";
+        case InternetSpeedTestEventPingFinished:
+            return @"ping_finished";
         case InternetSpeedTestEventDownloadStarted:
             return @"download_started";
         case InternetSpeedTestEventDownloadProgress:
@@ -185,13 +151,12 @@ typedef enum {
             return @"upload_finished";
         case InternetSpeedTestEventFinished:
             return @"finished";
-        // case InternetSpeedTestEventError:
-        //     return @"error";
         default:
             break;
     }
     return @"";
 }
+
 
 - (id)objectOrNull:(id)object {
   return object ?: [NSNull null];
@@ -199,6 +164,10 @@ typedef enum {
 
 - (id)objectOrNil:(id)object {
     return [object isEqual:[NSNull null]] ? nil : object;
+}
+
+- (BOOL)isStringNilOrEmpty:(NSString *)string {
+    return !string || [string isEqualToString:@""] || string.length == 0;
 }
 
 - (NSDictionary*)getServerDict:(SpeedTestServer*)server {
@@ -252,33 +221,10 @@ typedef enum {
      return dict;
 }
 
-
-
-- (void)requestPermissions:(CDVInvokedUrlCommand*)command {
-    self.locationManager = [CLLocationManager new];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (CLLocationManager.locationServicesEnabled) {
-            self.locationManager.delegate = self;
-            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-            [self.locationManager requestWhenInUseAuthorization];
-            [self.locationManager requestAlwaysAuthorization];
-            [self.locationManager startUpdatingLocation];
-        }
-    });
-}
-
-
-- (void)stopMonitoringLocation {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.locationManager stopUpdatingLocation];
-    });
-}
-
 #pragma mark - InternetSpeedTestDelegate
 
 - (void)internetTestErrorWithError:(enum SpeedTestError)error {
     [self sendErrorResult:error];
-    NSLog(@"Error %ld", (long)error);
 }
 
 - (void)internetTestFinishWithResult:(SpeedTestResult *)result {
@@ -292,6 +238,9 @@ typedef enum {
         [serversArray addObject:serverDict];
     }
     [self sendEvent:InternetSpeedTestEventReceivedServers data: @{@"servers": serversArray}];
+    if (serversArray.count > 0) {
+        [self sendEvent:InternetSpeedTestEventPingStarted data:nil];
+    }
 }
 
 - (void)internetTestSelectedWithServer:(SpeedTestServer *)server latency:(NSInteger)latency jitter:(NSInteger)jitter {
@@ -299,7 +248,7 @@ typedef enum {
     NSDictionary *data = @{ @"server": serverDict,
                             @"ping": [NSNumber numberWithInteger:latency],
                             @"jitter":  [NSNumber numberWithInteger:jitter]};
-    [self sendEvent:InternetSpeedTestEventSelectedServer data:data];
+    [self sendEvent:InternetSpeedTestEventPingFinished data:data];
 }
 
 - (void)internetTestDownloadStart {
