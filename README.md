@@ -106,14 +106,6 @@ Location permission keys:
 </config-file>
 ```
 
-If you don't want to use background tests add this to your config.xml file:
-```
-<!--Disable background tests-->
-<config-file target="*-Info.plist" parent="SpeedCheckerBackgroundTestNotUsed">
-    <true/>
-</config-file>
-```
-
 If you want to use background tests add this to your config.xml file:
 ```
 <!--Background modes key-->
@@ -132,6 +124,9 @@ If you want to use background tests add this to your config.xml file:
 </config-file>
 
 <!--Background test setup keys-->
+<config-file target="*-Info.plist" parent="SpeedCheckerBackgroundTestUsed">
+    <true/>
+</config-file>
 <config-file target="*-Info.plist" parent="SpeedCheckerBackgroundTestEnabledOnInit">
     <true/>
 </config-file>

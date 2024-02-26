@@ -11,7 +11,7 @@
 @end
 
 static NSString *const kBackgroundTestEnabledOnInit = @"SpeedCheckerBackgroundTestEnabledOnInit";
-static NSString *const kBackgroundTestNotUsed = @"SpeedCheckerBackgroundTestNotUsed";
+static NSString *const kBackgroundTestUsed = @"SpeedCheckerBackgroundTestUsed";
 static NSString *const kBackgroundConfigURL = @"SpeedCheckerBackgroundConfigURL";
 static NSString *const kSpeedCheckerLicenseKey = @"SpeedCheckerLicenseKey";
 
@@ -37,7 +37,7 @@ static AppDelegate* instance;
     
     instance = self;
 
-    if (self.backgroundTestNotUsed) {
+    if (!self.backgroundTestUsed) {
         // skip background test setup
         return YES;
     }
@@ -114,11 +114,10 @@ static AppDelegate* instance;
         return YES;
     }
 }
-
-- (BOOL)backgroundTestNotUsed {
-    id testNotUsed = [[NSBundle mainBundle] objectForInfoDictionaryKey:kBackgroundTestNotUsed];
-    if (testNotUsed && [testNotUsed isKindOfClass:[NSNumber class]]) {
-        return [testNotUsed boolValue];
+- (BOOL)backgroundTestUsed {
+    id testUsed = [[NSBundle mainBundle] objectForInfoDictionaryKey:kBackgroundTestUsed];
+    if (testUsed && [testUsed isKindOfClass:[NSNumber class]]) {
+        return [testUsed boolValue];
     }
     return NO;
 }
