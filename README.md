@@ -145,15 +145,15 @@ cordova emulate ios
 Use the following (sample) functions in index.js:
 
 #### To set a license key (for paid clients).
-if you have a license key, you can add your key as a String value in the app:
+if you have a license key, you should setup it in MainApplication native class:
 
 ```
-SpeedCheckerPlugin.setAndroidLicenseKey(
-            "your_Androidlicense_key",
-            function(err) {
-                console.log(err);
-            }
-    )
+class MainApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        SpeedcheckerSDK.setLicenseKey(this, "Insert your key here")
+    }
+}
 ```
 ```
 SpeedCheckerPlugin.setIosLicenseKey(
