@@ -145,8 +145,8 @@ cordova emulate ios
 Use the following (sample) functions in index.js:
 
 #### To set a license key (for paid clients).
-if you have a license key, you should setup it in MainApplication native class:
 
+For Android licenseKey should be setup in Application onCreate method in native flutter project code.
 ```
 class MainApplication : Application() {
     override fun onCreate() {
@@ -155,6 +155,7 @@ class MainApplication : Application() {
     }
 }
 ```
+For iOS use this method
 ```
 SpeedCheckerPlugin.setIosLicenseKey(
             "your_Ioslicense_key",
