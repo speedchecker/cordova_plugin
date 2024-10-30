@@ -155,7 +155,7 @@ class MainApplication : Application() {
     }
 }
 ```
-For iOS use this method
+For iOS use next method:
 ```
 SpeedCheckerPlugin.setIosLicenseKey(
             "your_Ioslicense_key",
